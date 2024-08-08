@@ -1,8 +1,12 @@
 <?php
 
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use App\Traits\ApiResponses;
+use Illuminate\Http\Request;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -15,5 +19,11 @@ return Application::configure(basePath: dirname(__DIR__))
         //
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        //
+
+        $exceptions->render(function (NotFoundHttpException $e, Request $request) {
+            $apiResponse = new class {
+                use \App\Traits\ApiResponses;
+            };
+                return $apiResponse->sendErrorResponse(__("general.no_records_found"));
+        });
     })->create();

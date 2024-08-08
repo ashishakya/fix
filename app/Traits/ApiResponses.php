@@ -3,6 +3,7 @@
 namespace App\Traits;
 
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Resources\Json\JsonResource;
 
 trait ApiResponses
 {
@@ -13,8 +14,12 @@ trait ApiResponses
      *
      * @return JsonResponse
      */
-    protected function sendSuccessResponse(array $data, string $successMessage = 'Success', int $statusCode = 200): JsonResponse
+    protected function sendSuccessResponse(array|JsonResource $data, string $successMessage = 'Success', int $statusCode = 200): JsonResponse
     {
+        if ($data instanceof JsonResource) {
+            $data = $data->response()->getData(true);
+        }
+
         $responseData = [
             "data"    => $data,
             "message" => $successMessage,
